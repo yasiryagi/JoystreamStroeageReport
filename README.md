@@ -1,13 +1,11 @@
 # JoystreamStroeageReport
 
-
-
 Full report for the Term: 13
 Start date: 2022-06-11
 End date: 2022-06-19
 Start Block: 1152000
 End Block: 1252800
----------------------------BUCKETS--------------------------------------
+# BUCKETS Info
 |   id |   dataObjectsSize |   dataObjectsSizeLimit |   dataObjectsCount |   bags |   Utilization |   dataObjectsSize, GB |
 |------|-------------------|------------------------|--------------------|--------|---------------|-----------------------|
 |    9 |        2580456339 |          1000000000000 |                 12 |      1 |   0.00258046  |             2.40089   |
@@ -21,17 +19,17 @@ End Block: 1252800
 |    2 |      888050580024 |          1400000000000 |              14690 |    634 |   0.634322    |           826.255     |
 |    3 |      888050580024 |          1400000000000 |              14690 |    634 |   0.634322    |           826.255     |
 |    4 |      888050580024 |          2000000000000 |              14690 |    634 |   0.444025    |           826.255     |
----------------------------BUCKETS CREATED--------------------------------------
+## BUCKETS CREATED
 Bucket Created: 1
 |   id |   dataObjectsSize |   dataObjectsSizeLimit |   dataObjectsCount |   bags |   Utilization |   dataObjectsSize, GB |
 |------|-------------------|------------------------|--------------------|--------|---------------|-----------------------|
 |   12 |          13226270 |          1500000000000 |                  2 |      1 |   8.81751e-06 |             0.0123059 |
----------------------------BUCKETS DELETED--------------------------------------
+## BUCKETS DELETED
 Bucket Deleted: 0
----------------------------BAGS--------------------------------------
+## Bags
 Bags Created: 5
 Bags Deleted: 0
----------------------------OBJECTS WITHIN THE WINDOW--------------------------------------
+# Objects Info during this Council Period
 Total Objects Size: 7133978634
 Objects Size Distribution
 |   <10 |   <100 |   <1000 |   <10000 |   <100000 |   <1000000 |
@@ -56,7 +54,7 @@ Objects Size Distribution Per Bag
 | 2604 |            24 |    619894302 |    2.58289e+07 |
 | 2633 |             2 |     13226270 |    6.61314e+06 |
 | 2634 |             2 |     13226270 |    6.61314e+06 |
----------------------------OBJECTS TOTAL--------------------------------------
+# Total object Info
 Total Objects Size: 888513497842
 Objects Size Distribution
 |   <10 |   <100 |   <1000 |   <10000 |   <100000 |   <1000000 |
@@ -676,7 +674,7 @@ Objects Size Distribution Per Bag
 | 2356 |             1 |         6348 |   6348           |
 | 2184 |             1 |         6202 |   6202           |
 | 2238 |             1 |         3668 |   3668           |
----------------------------LOST OBJECTS--------------------------------------
+# Lost Objects
 Total Objects: 73
 Total Lost Objects: 3
 Percentage Lost Objects: %4.109589041095891
