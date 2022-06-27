@@ -1,11 +1,17 @@
 # JoystreamStroeageReport
 
 Full report for the Term: 13
+
 Start date: 2022-06-11
+
 End date: 2022-06-19
+
 Start Block: 1152000
+
 End Block: 1252800
+
 # BUCKETS Info
+
 |   id |   dataObjectsSize |   dataObjectsSizeLimit |   dataObjectsCount |   bags |   Utilization |   dataObjectsSize, GB |
 |------|-------------------|------------------------|--------------------|--------|---------------|-----------------------|
 |    9 |        2580456339 |          1000000000000 |                 12 |      1 |   0.00258046  |             2.40089   |
@@ -31,14 +37,14 @@ Bags Created: 5
 Bags Deleted: 0
 # Objects Info during this Council Period
 Total Objects Size: 7133978634
-Objects Size Distribution
+## Objects Size Distribution
 |   <10 |   <100 |   <1000 |   <10000 |   <100000 |   <1000000 |
 |-------|--------|---------|----------|-----------|------------|
 |    43 |     62 |      71 |       73 |        73 |         73 |
 |   0-10 |   10-100 |   100-1000 |   1000-10000 |   10000-100000 |   100000-10000000 |
 |--------|----------|------------|--------------|----------------|-------------------|
 |     43 |       19 |          9 |            2 |              0 |                 0 |
-Objects Size Distribution Per Bag
+## Objects Size Distribution Per Bag
 |   id |   objects_num |   total_size |   average_size |
 |------|---------------|--------------|----------------|
 | 2001 |             1 |    619041927 |    6.19042e+08 |
@@ -56,14 +62,14 @@ Objects Size Distribution Per Bag
 | 2634 |             2 |     13226270 |    6.61314e+06 |
 # Total object Info
 Total Objects Size: 888513497842
-Objects Size Distribution
+## Objects Size Distribution
 |   <10 |   <100 |   <1000 |   <10000 |   <100000 |   <1000000 |
 |-------|--------|---------|----------|-----------|------------|
 |  8649 |  12503 |   14673 |    14760 |     14760 |      14760 |
 |   0-10 |   10-100 |   100-1000 |   1000-10000 |   10000-100000 |   100000-10000000 |
 |--------|----------|------------|--------------|----------------|-------------------|
 |   8649 |     3854 |       2170 |           87 |              0 |                 0 |
-Objects Size Distribution Per Bag
+## Objects Size Distribution Per Bag
 |   id |   objects_num |   total_size |     average_size |
 |------|---------------|--------------|------------------|
 | 2045 |           933 |  43241069533 |      4.63463e+07 |
