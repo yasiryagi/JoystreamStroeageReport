@@ -27,7 +27,7 @@ def get_councils_period(url):
     data.pop(-1)
   data = sorted(data, key = itemgetter('endedAtBlock'))
   period = len(data)
-  return data[-1], data[-2], period
+  return data[-1], data[-2], data[0], period
 
 def get_backets(url, start_time = '', end_time = '', createdat = False, deletedat = False):
   if start_time and end_time :
@@ -221,13 +221,17 @@ def print_table(data, master_key = '', sort_key = ''):
         print(tabulate(table, headers, tablefmt="grid"))       
 
 if __name__ == '__main__':
-  last_council,previous_council,period = get_councils_period(url)
+  last_council,previous_council,first_council, period = get_councils_period(url)
   #start_date = "2022-06-18"
   #end_date   = "2022-06-24"
+  first_time = first_council['electedAtTime']
   start_time = last_council['electedAtTime']
   end_time   = last_council['endedAtTime']
   start_date = start_time.split('T')[0]
   end_date = end_time.split('T')[0]
+  previous_start_time = previous_council['electedAtTime']
+  previous_end_time   = previous_council['endedAtTime']
+
   #start_time= "{}T00:00:00.000Z".format(start_date)
   #end_time  = "{}T00:00:00.000Z".format(end_date)
   print('Full report for the Term: {}\n'.format(period))
@@ -239,6 +243,15 @@ if __name__ == '__main__':
   print('End Block: {}\n'.format(last_council['endedAtBlock']))
   print('# BUCKETS Info  ')
   buckets = get_backets(url)
+  previous_buckets = get_backets(url, first_time, previous_end_time, createdat = True)
+  for bucket in buckets:
+    for pre_bucket in previous_buckets:
+      if bucket['id'] == pre_bucket['id'] :
+        removed_id  = pre_bucket.pop('id')
+        for key, value in pre_bucket.items():
+          bucket['pre-'+key] = value
+        previous_buckets.remove(pre_bucket)
+        break	
   print_table(buckets)
   print('## BUCKETS CREATED')
   buckets_created = get_backets(url,start_time,end_time,createdat = True)
