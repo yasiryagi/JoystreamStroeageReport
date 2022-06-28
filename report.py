@@ -50,8 +50,35 @@ def get_backets(url, start_time = '', end_time = '', createdat = False, deleteda
   #  writer.writerows(data)
   #return file_name
   return data
- 
-def get_bags(start_time= "2022-06-18T00:00:00.000Z", end_time= "2022-06-24T00:00:00.000Z"):
+
+def get_rewards(start_time, end_time):
+  query = '{{ rewardPaidEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ paymentType amount workerId }} }}'.format(start_time, end_time)
+  query_dict = {"query": query}
+  data = queryGrapql(query_dict,url)['rewardPaidEvents']
+  total = 0
+  result = []
+  sorted_data = sorted(data, key = itemgetter('workerId'))
+  for key, values in groupby(sorted_data, key = itemgetter('workerId')):
+    worker_total = 0
+    for value in list(values):
+      worker_total += int(value["amount"])
+    result.append({'workerId':key, 'worker_total':worker_total})
+    total += worker_total
+  return total,result
+
+def get_new_hire(start_time, end_time):
+  query = '{{ openingFilledEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ workersHired {{ id membershipId}}}}}}'.format(start_time, end_time)
+  print(query)
+  query_dict = {"query": query}
+  data = queryGrapql(query_dict,url)['openingFilledEvents']
+  result = []
+  if len(data) == 0:
+    return result
+  for record in data:
+    result.append(record['workersHired'][0])
+  return result
+
+def get_bags(start_time, end_time):
   query_created = {"query": 'query MyQuery {{ storageBags( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
   query_deleted = {"query": 'query MyQuery {{ storageBags( where: {{deletedAt_gt: "{}" , deletedAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
   data_created  = queryGrapql(query_created)['storageBags']
@@ -231,16 +258,24 @@ if __name__ == '__main__':
   end_date = end_time.split('T')[0]
   previous_start_time = previous_council['electedAtTime']
   previous_end_time   = previous_council['endedAtTime']
-
+  
   #start_time= "{}T00:00:00.000Z".format(start_date)
   #end_time  = "{}T00:00:00.000Z".format(end_date)
   print('Full report for the Term: {}\n'.format(period))
   print('Start date: {} \n'.format(start_date))
   print('End date: {} \n'.format(end_date))
-  #print('Start Time: {}'.format(start_time))
-  #print('End Time: {}'.format(end_time))
+  #print('Start Time: {}\n'.format(start_time))
+  #print('End Time: {}\n'.format(end_time))
   print('Start Block: {}\n'.format(last_council['electedAtBlock']))
   print('End Block: {}\n'.format(last_council['endedAtBlock']))
+  print('# Hiring')
+  hired_workers = get_new_hire(start_time, end_time)
+  print('Number of hired works: {}'.format(len(hired_workers)))
+  print_table(hired_workers)
+  print('# Rewards')
+  total_rewards,rewards =  get_rewards(start_time, end_time)
+  print('Total Rewards: {}'.format(total_rewards))
+  print_table(rewards)
   print('# BUCKETS Info  ')
   buckets = get_backets(url)
   previous_buckets = get_backets(url, first_time, previous_end_time, createdat = True)
