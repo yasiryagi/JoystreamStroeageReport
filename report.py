@@ -68,7 +68,6 @@ def get_rewards(start_time, end_time):
 
 def get_new_hire(start_time, end_time):
   query = '{{ openingFilledEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ workersHired {{ id membershipId}}}}}}'.format(start_time, end_time)
-  print(query)
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['openingFilledEvents']
   result = []
