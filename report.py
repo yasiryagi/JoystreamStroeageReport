@@ -242,14 +242,19 @@ def print_table(data, master_key = '', sort_key = ''):
             row.append(line[key])
         table.append(row)
     try:
-        print(tabulate(table, headers, tablefmt="github"))
+        result = tabulate(table, headers, tablefmt="github")
+        print(result)
+        return result
     except UnicodeEncodeError:
-        print(tabulate(table, headers, tablefmt="grid"))       
+        result = tabulate(table, headers, tablefmt="grid")
+        print(result)
+        return result
 
 if __name__ == '__main__':
   last_council,previous_council,first_council, period = get_councils_period(url)
   #start_date = "2022-06-18"
   #end_date   = "2022-06-24"
+  report = ''
   first_time = first_council['electedAtTime']
   start_time = last_council['electedAtTime']
   end_time   = last_council['endedAtTime']
@@ -257,64 +262,113 @@ if __name__ == '__main__':
   end_date = end_time.split('T')[0]
   previous_start_time = previous_council['electedAtTime']
   previous_end_time   = previous_council['endedAtTime']
-  
+  file_name = 'report-'+end_time  
   #start_time= "{}T00:00:00.000Z".format(start_date)
-  #end_time  = "{}T00:00:00.000Z".format(end_date)
+  #end_time  = "{}T00:tabulate00:00.000Z".format(end_date)
   print('Full report for the Term: {}\n'.format(period))
   print('Start date: {} \n'.format(start_date))
   print('End date: {} \n'.format(end_date))
+  report += 'Full report for the Term: {}\n'.format(period)
+  report += 'Start date: {} \n'.format(start_date)
+  report += 'End date: {} \n'.format(end_date)
   #print('Start Time: {}\n'.format(start_time))
   #print('End Time: {}\n'.format(end_time))
   print('Start Block: {}\n'.format(last_council['electedAtBlock']))
   print('End Block: {}\n'.format(last_council['endedAtBlock']))
+  report += 'Start Block: {}\n'.format(last_council['electedAtBlock'])
+  report += 'End Block: {}\n'.format(last_council['endedAtBlock'])
+
   print('# Hiring')
   hired_workers = get_new_hire(start_time, end_time)
   print('Number of hired works: {}'.format(len(hired_workers)))
-  print_table(hired_workers)
+  report += '# Hiring\n'
+  report += 'Number of hired works: {}\n'.format(len(hired_workers))
+  tble = print_table(hired_workers)
+  report += tble+'\n'
+
   print('# Rewards')
+  report += '# Rewards\n'
   total_rewards,rewards =  get_rewards(start_time, end_time)
   print('Total Rewards: {}'.format(total_rewards))
-  print_table(rewards)
+  report += 'Total Rewards: {}\n'.format(total_rewards)
+  tble = print_table(rewards)
+  report += tble+'\n'
+  
   print('# BUCKETS Info  ')
+  report += '# BUCKETS Info  \n'
   buckets = get_backets(url)
-  print_table(buckets)
+  tble = print_table(buckets)
+  report += tble+'\n'
+
   print('## BUCKETS CREATED')
+  report += '## BUCKETS CREATED\n'
   buckets_created = get_backets(url,start_time,end_time,createdat = True)
   number_buckets_created = len(buckets_created)
   print('Bucket Created: {}'.format(number_buckets_created))
+  report += 'Bucket Created: {}\n'.format(number_buckets_created)
   if number_buckets_created > 0:
-    print_table(buckets_created)
+    tble = print_table(buckets_created)
+    report += tble+'\n'
+
   print('## BUCKETS DELETED')
+  report += '## BUCKETS DELETED\n'
   buckets_deleted = get_backets(url,start_time,end_time,deletedat = True)
   number_buckets_deleted = len(buckets_deleted)
   print('Bucket Deleted: {}\n'.format(number_buckets_deleted))
+  report += 'Bucket Deleted: {}\n'.format(number_buckets_deleted)
   if number_buckets_deleted > 0:
-    print_table(buckets_deleted)
+    tble = print_table(buckets_deleted)
+    report += tble+'\n'
+
   print('## Bags')
+  report += '## Bags\n'
   bags = get_bags(start_time, end_time)
   print('Bags Created: {}\n'.format(bags['bag created']))
   print('Bags Deleted: {}\n'.format(bags['bags deleted']))
+  report += 'Bags Created: {}\n'.format(bags['bag created'])
+  report += 'Bags Deleted: {}\n'.format(bags['bags deleted'])
+
   print('# Objects Info during this Council Period')
+  report += '# Objects Info during this Council Period \n'
   #print(get_objects(start_time,end_time))
   total_size,sizes,sizes_range,bags_stats = objects_stats(start_time,end_time)
   print('Total Objects Size: {}\n'.format(total_size))
+  report += 'Total Objects Size: {}\n'.format(total_size)
   print('## Objects Size Distribution')
-  print_table([sizes])
+  report += '## Objects Size Distribution\n'
+  tble = print_table([sizes])
+  report += tble+'\n'
   print('\n')
-  print_table([sizes_range])
+  tble = print_table([sizes_range])
+  report += tble+'\n'
+
   print('## Objects Size Distribution Per Bag')
-  print_table(bags_stats)
+  tble = print_table(bags_stats)
+  report += '## Objects Size Distribution Per Bag \n'
+  report += tble+'\n'
+
   print('# Total object Info')
+  report += '# Total object Info \n'
   #print(get_objects(start_time,end_time))
   total_size,sizes,sizes_range,bags_stats = objects_stats()
   print('Total Objects Size: {}\n'.format(total_size))
+  report += 'Total Objects Size: {}\n'.format(total_size)
+
   print('## Objects Size Distribution')
-  print_table([sizes])
+  report += '## Objects Size Distribution \n'
+  tble = print_table([sizes])
+  report += tble+'\n'
   print('\n')
-  print_table([sizes_range])
+
+  tble = print_table([sizes_range])
+  report += tble+'\n'
   print('## Objects Size Distribution Per Bag')
-  print_table(bags_stats, sort_key = 'total_size')
+  report += '## Objects Size Distribution Per Bag \n'
+  tble = print_table(bags_stats, sort_key = 'total_size')
+  report += tble+'\n'
+
   print('# Lost Objects')
+  report += '# Lost Objects \n'
   master_objects = get_objects(start_time,end_time)
   data = get_objects_files(file_server, operators, end_date, credential)
   operators = load_objects_from_server(data)
@@ -327,4 +381,12 @@ if __name__ == '__main__':
   print('Total Objects: {}\n'.format(total_objects))
   print('Total Lost Objects: {}\n'.format(lost_object))
   print('Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects))
-  print_table(lost, master_key = 'id')
+  tble = print_table(lost, master_key = 'id')
+  report += 'Total Objects: {}\n'.format(total_objects)
+  report += 'Total Lost Objects: {}\n'.format(lost_object)
+  report += 'Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects)
+  report += tble+'\n'
+  file_name = 'report'+end_time+'.md
+  with open(file_name, 'w') as file:
+    file.write(report)
+    file.close()
