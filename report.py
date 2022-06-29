@@ -345,7 +345,7 @@ if __name__ == '__main__':
   print('## Objects Size Distribution')
   report += '## Objects Size Distribution\n'
   tble = print_table([sizes])
-  report += tble+'\n'
+  report += tble+'\n \r\n'
   print('\n')
   tble = print_table([sizes_range])
   report += tble+'\n'
@@ -365,7 +365,7 @@ if __name__ == '__main__':
   print('## Objects Size Distribution')
   report += '## Objects Size Distribution \n'
   tble = print_table([sizes])
-  report += tble+'\n \n'
+  report += tble+'\n \r\n'
   print('\n')
 
   tble = print_table([sizes_range])
