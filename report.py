@@ -52,7 +52,7 @@ def get_backets(url, start_time = '', end_time = '', createdat = False, deleteda
   return data
 
 def get_rewards(start_time, end_time):
-  query = '{{ rewardPaidEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ paymentType amount workerId }} }}'.format(start_time, end_time)
+  query = '{{ rewardPaidEvents(limit: 33000, offset: 0, where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ paymentType amount workerId }} }}'.format(start_time, end_time)
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['rewardPaidEvents']
   total = 0
@@ -277,15 +277,6 @@ if __name__ == '__main__':
   print_table(rewards)
   print('# BUCKETS Info  ')
   buckets = get_backets(url)
-  previous_buckets = get_backets(url, first_time, previous_end_time, createdat = True)
-  for bucket in buckets:
-    for pre_bucket in previous_buckets:
-      if bucket['id'] == pre_bucket['id'] :
-        removed_id  = pre_bucket.pop('id')
-        for key, value in pre_bucket.items():
-          bucket['pre-'+key] = value
-        previous_buckets.remove(pre_bucket)
-        break	
   print_table(buckets)
   print('## BUCKETS CREATED')
   buckets_created = get_backets(url,start_time,end_time,createdat = True)
