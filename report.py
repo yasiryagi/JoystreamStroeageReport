@@ -297,8 +297,16 @@ if __name__ == '__main__':
   print('# BUCKETS Info  ')
   report += '# BUCKETS Info  \n'
   buckets = get_backets(url)
+  buckets_file = 'buckets_'+end_time
+  with open(buckets_file, 'w') as file:
+    json.dump(buckets, file)
+    file.close()
+  
   tble = print_table(buckets)
   report += tble+'\n'
+  
+
+  
 
   print('## BUCKETS CREATED')
   report += '## BUCKETS CREATED\n'
