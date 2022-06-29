@@ -386,7 +386,7 @@ if __name__ == '__main__':
   report += 'Total Lost Objects: {}\n'.format(lost_object)
   report += 'Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects)
   report += tble+'\n'
-  file_name = 'report'+end_time+'.md
+  file_name = 'report_'+end_time+'.md'
   with open(file_name, 'w') as file:
     file.write(report)
     file.close()
