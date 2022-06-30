@@ -269,7 +269,7 @@ if __name__ == '__main__':
   print('Start date: {} \n'.format(start_date))
   print('End date: {} \n'.format(end_date))
   report += 'Full report for the Term: {} \r\n\n'.format(period)
-  report += 'Start date: {}  \r\\nn'.format(start_date)
+  report += 'Start date: {}  \r\\n\n'.format(start_date)
   report += 'End date: {} \r\n\n'.format(end_date)
   #print('Start Time: {}\n'.format(start_time))
   #print('End Time: {}\n'.format(end_time))
