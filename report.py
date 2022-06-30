@@ -150,7 +150,7 @@ def objects_stats(start_time='',end_time=''):
   sizes_range = {'0-10 MB': 0,'10-100 MB': 0,'100-1000 MB': 0,'1000-10000 MB': 0,'10000-100000 MB': 0,'100000-10000000 MB': 0}
   total_size,sizes,sizes_range =get_0bjects_ranges(data_created,total_size,sizes,sizes_range)
   bags_stats = bag_stats(data_created)
-  return total_size,sizes,sizes_range,bags_stats
+  return num_objects_created, total_size,sizes,sizes_range,bags_stats
  
 def get_0bjects_ranges(data_created,total_size,sizes,sizes_range): 
   for record in data_created:
@@ -219,8 +219,8 @@ def bag_stats(data_created):
     bag['objects_num'] = len(value)
     for obj in value:
       total_size += int(obj['size'])
-    bag['total_size'] = total_size
-    bag['average_size'] = int(total_size / bag['objects_num'])
+    bag['total_size bytes'] = total_size
+    bag['average_size bytes'] = int(total_size / bag['objects_num'])
     result.append(bag)
   return result
 
@@ -331,15 +331,17 @@ if __name__ == '__main__':
   print('## Bags')
   report += '## Bags\n'
   bags = get_bags(start_time, end_time)
-  print('Bags Created: {}\n'.format(bags['bag created']))
-  print('Bags Deleted: {}\n'.format(bags['bags deleted']))
-  report += 'Bags Created: {}\n'.format(bags['bag created'])
-  report += 'Bags Deleted: {}\n'.format(bags['bags deleted'])
-
+  print('Bags Created: {} \n'.format(bags['bag created']))
+  print('Bags Deleted: {} \n'.format(bags['bags deleted']))
+  report += 'Bags Created: {} \n\n'.format(bags['bag created'])
+  report += 'Bags Deleted: {} \n\n'.format(bags['bags deleted'])
+ 
   print('# Objects Info during this Council Period')
   report += '# Objects Info during this Council Period \n'
   #print(get_objects(start_time,end_time))
-  total_size,sizes,sizes_range,bags_stats = objects_stats(start_time,end_time)
+  objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats(start_time,end_time)
+  print('Total Objects Size: {}\n'.format(objects_num))
+  report += 'Total Objects Size: {}\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
   report += 'Total Objects Size: {}\n'.format(total_size)
   print('## Objects Size Distribution')
@@ -358,7 +360,9 @@ if __name__ == '__main__':
   print('# Total object Info')
   report += '# Total object Info \n'
   #print(get_objects(start_time,end_time))
-  total_size,sizes,sizes_range,bags_stats = objects_stats()
+  objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats()
+  print('Total Objects Size: {}\n'.format(objects_num))
+  report += 'Total Objects Size: {}\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
   report += 'Total Objects Size: {}\n'.format(total_size)
 
@@ -372,7 +376,7 @@ if __name__ == '__main__':
   report += tble+'\n'
   print('## Objects Size Distribution Per Bag')
   report += '## Objects Size Distribution Per Bag \n'
-  tble = print_table(bags_stats, sort_key = 'total_size')
+  tble = print_table(bags_stats, sort_key = 'total_size bytes')
   report += tble+'\n'
 
   print('# Lost Objects')
@@ -390,9 +394,9 @@ if __name__ == '__main__':
   print('Total Lost Objects: {}\n'.format(lost_object))
   print('Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects))
   tble = print_table(lost, master_key = 'id')
-  report += 'Total Objects: {}\n'.format(total_objects)
-  report += 'Total Lost Objects: {}\n'.format(lost_object)
-  report += 'Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects)
+  report += 'Total Objects: {} \n\n'.format(total_objects)
+  report += 'Total Lost Objects: {} \n\n'.format(lost_object)
+  report += 'Percentage Lost Objects: %{} \n\n'.format(100*lost_object/total_objects)
   report += tble+'\n'
   file_name = 'report_'+end_time+'.md'
   with open(file_name, 'w') as file:
