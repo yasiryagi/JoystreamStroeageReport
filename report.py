@@ -265,7 +265,7 @@ if __name__ == '__main__':
   file_name = 'report-'+end_time  
   #start_time= "{}T00:00:00.000Z".format(start_date)
   #end_time  = "{}T00:tabulate00:00.000Z".format(end_date)
-  print('Full report for the Term: {}\n'.format(period))
+  print('Full report for the Term: {} \n'.format(period))
   print('Start date: {} \n'.format(start_date))
   print('End date: {} \n'.format(end_date))
   report += 'Full report for the Term: {} \n'.format(period)
