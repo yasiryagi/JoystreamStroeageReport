@@ -341,9 +341,9 @@ if __name__ == '__main__':
   #print(get_objects(start_time,end_time))
   objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats(start_time,end_time)
   print('Total Objects Size: {}\n'.format(objects_num))
-  report += 'Total Objects Size: {} \n'.format(objects_num)
+  report += 'Total Objects Size: {} \n\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
-  report += 'Total Objects Size: {} \n'.format(total_size)
+  report += 'Total Objects Size: {} bytes \n\n'.format(total_size)
   print('## Objects Size Distribution')
   report += '## Objects Size Distribution\n'
   tble = print_table([sizes])
@@ -362,9 +362,9 @@ if __name__ == '__main__':
   #print(get_objects(start_time,end_time))
   objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats()
   print('Total Objects Size: {}\n'.format(objects_num))
-  report += 'Total Objects Size: {} \n'.format(objects_num)
+  report += 'Total Objects Size: {} \n\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
-  report += 'Total Objects Size: {} \n'.format(total_size)
+  report += 'Total Objects Size: {} bytes\n\n'.format(total_size)
 
   print('## Objects Size Distribution')
   report += '## Objects Size Distribution \n'
