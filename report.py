@@ -146,8 +146,8 @@ def objects_stats(start_time='',end_time=''):
   data_created = get_objects(start_time,end_time)
   num_objects_created = len(data_created)
   total_size = 0
-  sizes = {'<10': 0,'<100': 0,'<1000': 0,'<10000': 0,'<100000': 0,'<1000000': 0}
-  sizes_range = {'0-10': 0,'10-100': 0,'100-1000': 0,'1000-10000': 0,'10000-100000': 0,'100000-10000000': 0}
+  sizes = {'<10 MB': 0,'<100 MB': 0,'<1000 MB': 0,'<10000 MB': 0,'<100000 MB': 0,'<1000000 MB': 0}
+  sizes_range = {'0-10 MB': 0,'10-100 MB': 0,'100-1000 MB': 0,'1000-10000 MB': 0,'10000-100000 MB': 0,'100000-10000000 MB': 0}
   total_size,sizes,sizes_range =get_0bjects_ranges(data_created,total_size,sizes,sizes_range)
   bags_stats = bag_stats(data_created)
   return total_size,sizes,sizes_range,bags_stats
@@ -158,45 +158,45 @@ def get_0bjects_ranges(data_created,total_size,sizes,sizes_range):
     total_size += size
     size = size / 1048576
     if size < 10:
-      sizes['<10'] += 1
-      sizes['<100'] += 1
-      sizes['<1000'] += 1
-      sizes['<10000'] += 1
-      sizes['<100000'] += 1
-      sizes['<1000000'] += 1
+      sizes['<10 MB'] += 1
+      sizes['<100 MB'] += 1
+      sizes['<1000 MB'] += 1
+      sizes['<10000 MB'] += 1
+      sizes['<100000 MB'] += 1
+      sizes['<1000000 MB'] += 1
     elif size < 100:
-      sizes['<100'] += 1
-      sizes['<1000'] += 1
-      sizes['<10000'] += 1
-      sizes['<100000'] += 1
-      sizes['<1000000'] += 1
+      sizes['<100 MB'] += 1
+      sizes['<1000 MB'] += 1
+      sizes['<10000 MB'] += 1
+      sizes['<100000 MB'] += 1
+      sizes['<1000000 MB'] += 1
     elif size < 1000:
-      sizes['<1000'] += 1
-      sizes['<10000'] += 1
-      sizes['<100000'] += 1
-      sizes['<1000000'] += 1
+      sizes['<1000 MB'] += 1
+      sizes['<10000 MB'] += 1
+      sizes['<100000 MB'] += 1
+      sizes['<1000000 MB'] += 1
     elif size < 10000:
-      sizes['<10000'] += 1
-      sizes['<100000'] += 1
-      sizes['<1000000'] += 1
+      sizes['<10000 MB'] += 1
+      sizes['<100000 MB'] += 1
+      sizes['<1000000 MB'] += 1
     elif size < 100000:
-      sizes['<100000'] += 1
-      sizes['<1000000'] += 1
+      sizes['<100000 MB'] += 1
+      sizes['<1000000 MB'] += 1
     else:
-      sizes['<1000000'] += 1
+      sizes['<1000000 MB'] += 1
    
     if size < 10:
-      sizes_range['0-10'] += 1
+      sizes_range['0-10 MB'] += 1
     elif size < 100:
-      sizes_range['10-100'] += 1
+      sizes_range['10-100 MB'] += 1
     elif size < 1000:
-      sizes_range['100-1000'] += 1
+      sizes_range['100-1000 MB'] += 1
     elif size < 10000:
-      sizes_range['1000-10000'] += 1
+      sizes_range['1000-10000 MB'] += 1
     elif size < 100000:
-      sizes_range['10000-100000'] += 1
+      sizes_range['10000-100000 MB'] += 1
     else:
-      sizes_range['100000-10000000'] += 1
+      sizes_range['100000-10000000 MB'] += 1
   return  total_size, sizes, sizes_range
 
 
@@ -220,7 +220,7 @@ def bag_stats(data_created):
     for obj in value:
       total_size += int(obj['size'])
     bag['total_size'] = total_size
-    bag['average_size'] = total_size / bag['objects_num']
+    bag['average_size'] = int(total_size / bag['objects_num'])
     result.append(bag)
   return result
 
