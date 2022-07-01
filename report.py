@@ -66,16 +66,36 @@ def get_rewards(start_time, end_time):
     total += worker_total
   return total,result
 
+def get_new_opening(start_time, end_time):
+  query = '{{ openingAddedEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ opening {{ createdAt id }} }} }}'.format(start_time, end_time)
+  query_dict = {"query": query}
+  data = queryGrapql(query_dict,url)['openingAddedEvents']
+  result = []
+  if len(data) == 0:
+    return 0,result
+  for record in data:
+    result.append(record['opening'])
+  length = len(result)
+  return length,result
+
 def get_new_hire(start_time, end_time):
   query = '{{ openingFilledEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ workersHired {{ id membershipId}}}}}}'.format(start_time, end_time)
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['openingFilledEvents']
   result = []
   if len(data) == 0:
-    return result
+    return 0,result
   for record in data:
     result.append(record['workersHired'][0])
-  return result
+  length = len(result)
+  return length, result
+
+def get_termination(start_time, end_time):
+  query = '{{ terminatedWorkerEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ workerId createdAt }}}}'.format(start_time, end_time)
+  query_dict = {"query": query}
+  data = queryGrapql(query_dict,url)['terminatedWorkerEvents']
+  length = len(data)
+  return length,data
 
 def get_bags(start_time, end_time):
   query_created = {"query": 'query MyQuery {{ storageBags( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
@@ -252,8 +272,6 @@ def print_table(data, master_key = '', sort_key = ''):
 
 if __name__ == '__main__':
   last_council,previous_council,first_council, period = get_councils_period(url)
-  #start_date = "2022-06-18"
-  #end_date   = "2022-06-24"
   report = ''
   first_time = first_council['electedAtTime']
   start_time = last_council['electedAtTime']
@@ -263,28 +281,45 @@ if __name__ == '__main__':
   previous_start_time = previous_council['electedAtTime']
   previous_end_time   = previous_council['endedAtTime']
   file_name = 'report-'+end_time  
-  #start_time= "{}T00:00:00.000Z".format(start_date)
-  #end_time  = "{}T00:tabulate00:00.000Z".format(end_date)
   print('Full report for the Term: {} \n\n'.format(period))
   print('Start date: {} \n'.format(start_date))
   print('End date: {} \n'.format(end_date))
   report += 'Full report for the Term: {} \n\n'.format(period)
   report += 'Start date: {}  \n\n'.format(start_date)
   report += 'End date: {} \n\n'.format(end_date)
-  #print('Start Time: {}\n'.format(start_time))
-  #print('End Time: {}\n'.format(end_time))
+  print('Start Time: {}\n'.format(start_time))
+  print('End Time: {}\n'.format(end_time))
   print('Start Block: {}\n'.format(last_council['electedAtBlock']))
   print('End Block: {}\n'.format(last_council['endedAtBlock']))
   report += 'Start Block: {} \n\n'.format(last_council['electedAtBlock'])
   report += 'End Block: {} \n\n'.format(last_council['endedAtBlock'])
 
+  print('# Opening')
+  num_openings, openings = get_new_opening(start_time, end_time)
+  print('Number of openings: {}'.format(num_openings))
+  report += '# Opening \n'
+  report += 'Number of openings: {} \n'.format(num_openings)
+  if num_openings > 0:
+    tble = print_table(openings)
+    report += tble+'\n'
+
   print('# Hiring')
-  hired_workers = get_new_hire(start_time, end_time)
-  print('Number of hired works: {}'.format(len(hired_workers)))
+  num_workers, hired_workers = get_new_hire(start_time, end_time)
+  print('Number of hired works: {}'.format(num_workers))
   report += '# Hiring\n'
-  report += 'Number of hired works: {}\n'.format(len(hired_workers))
-  tble = print_table(hired_workers)
-  report += tble+'\n'
+  report += 'Number of hired works: {}\n'.format(num_workers)
+  if num_workers > 0:
+    tble = print_table(hired_workers)
+    report += tble+'\n'
+
+  print('# Terminated workers')
+  num_workers, terminated_workers = get_termination(start_time, end_time)
+  print('Number of terminated workers: {}'.format(num_workers))
+  report += '# Terminated_workers \n'
+  report += 'Number of terminated workers: {} \n'.format(num_workers)
+  if num_workers > 0:
+    tble = print_table(terminated_workers)
+    report += tble+'\n'
 
   print('# Rewards')
   report += '# Rewards\n'
