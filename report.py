@@ -162,6 +162,15 @@ def compare_objects(file_objects, objects):
         lost.append(obj)
     return lost
 
+def get_lost(start_time, end_time):
+  query = '{{ storageDataObjects(limit: 3000, offset: 0, where: {{isAccepted_eq: false, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }}}}'.format(start_time, end_time)
+  query_dict = {"query": query}
+  data = queryGrapql(query_dict,url)['storageDataObjects']
+  for obj in data:
+    obj['storageBagId'] = obj['storageBagId'].split(":")[2]
+  length = len(data)
+  return length,data
+
 def objects_stats(start_time='',end_time=''):
   data_created = get_objects(start_time,end_time)
   num_objects_created = len(data_created)
@@ -414,8 +423,8 @@ if __name__ == '__main__':
   tble = print_table(bags_stats, sort_key = 'total_size bytes')
   report += tble+'\n'
 
-  print('# Lost Objects')
-  report += '# Lost Objects \n'
+  print('# Lost Objects - Server compare')
+  report += '# Lost Objects - Server compare \n'
   master_objects = get_objects(start_time,end_time)
   data = get_objects_files(file_server, operators, end_date, credential)
   operators = load_objects_from_server(data)
@@ -428,10 +437,23 @@ if __name__ == '__main__':
   print('Total Objects: {}\n'.format(total_objects))
   print('Total Lost Objects: {}\n'.format(lost_object))
   print('Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects))
-  tble = print_table(lost, master_key = 'id')
+  if lost_object > 0:
+    tble = print_table(lost, master_key = 'id')
   report += 'Total Objects: {} \n\n'.format(total_objects)
   report += 'Total Lost Objects: {} \n\n'.format(lost_object)
   report += 'Percentage Lost Objects: %{} \n\n'.format(100*lost_object/total_objects)
+  report += tble+' \n'
+  print('# Lost Objects - GraphQl')
+  report += '# Lost Objects - GraphQl \n'
+  number_lost, lost = get_lost(start_time,end_time)
+  print('Total Objects: {}\n'.format(total_objects))
+  print('Total Lost Objects: {}\n'.format(number_lost))
+  print('Percentage Lost Objects: %{}\n'.format(100*number_lost/total_objects))
+  if number_lost > 0:
+    tble = print_table(lost, master_key = 'id')
+  report += 'Total Objects: {} \n\n'.format(total_objects)
+  report += 'Total Lost Objects: {} \n\n'.format(number_lost)
+  report += 'Percentage Lost Objects: %{} \n\n'.format(100*number_lost/total_objects)
   report += tble+' \n'
   file_name = 'report_'+end_time+'.md'
   with open(file_name, 'w') as file:
