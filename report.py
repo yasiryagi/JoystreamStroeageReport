@@ -79,22 +79,36 @@ def get_new_opening(start_time, end_time):
   return length,result
 
 def get_new_hire(start_time, end_time):
-  query = '{{ openingFilledEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ workersHired {{ id membershipId}}}}}}'.format(start_time, end_time)
+  query = '{{ openingFilledEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ createdAt  workersHired {{ id membershipId}}}}}}'.format(start_time, end_time)
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['openingFilledEvents']
   result = []
   if len(data) == 0:
     return 0,result
   for record in data:
+    record['workersHired'][0]['createdAt'] = record['createdAt']
     result.append(record['workersHired'][0])
   length = len(result)
   return length, result
 
+def get_slashes(start_time, end_time):
+  query = '{{ stakeSlashedEvents(where: {{group: {{id_eq: "storageWorkingGroup", createdAt_gt: "{}", createdAt_lt: "{}"}}}}) {{ createdAt worker {{ membershipId }} slashedAmount workerId }}}}'.format(start_time, end_time)
+  query_dict = {"query": query}
+  data = queryGrapql(query_dict,url)['stakeSlashedEvents']
+  length = len(data)
+  if length > 0:
+   for record in data:
+     record["worker"] = record["worker"]["membershipId"]
+  return length,data
+
 def get_termination(start_time, end_time):
-  query = '{{ terminatedWorkerEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ workerId createdAt }}}}'.format(start_time, end_time)
+  query = '{{ terminatedWorkerEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{createdAt workerId worker {{membershipId}} }}}}'.format(start_time, end_time)
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['terminatedWorkerEvents']
   length = len(data)
+  if length > 0:
+   for record in data:
+     record["worker"] = record["worker"]["membershipId"]
   return length,data
 
 def get_bags(start_time, end_time):
@@ -324,10 +338,19 @@ if __name__ == '__main__':
   print('# Terminated workers')
   num_workers, terminated_workers = get_termination(start_time, end_time)
   print('Number of terminated workers: {}'.format(num_workers))
-  report += '# Terminated_workers \n'
+  report += '# Terminated workers \n'
   report += 'Number of terminated workers: {} \n'.format(num_workers)
   if num_workers > 0:
     tble = print_table(terminated_workers)
+    report += tble+'\n'
+
+  print('# Slashed workers')
+  num_workers, slashed_workers = get_slashes(start_time, end_time)
+  print('Number of slashed workers: {}'.format(num_workers))
+  report += '# Slashed workers \n'
+  report += 'Number of slashed workers: {} \n'.format(num_workers)
+  if num_workers > 0:
+    tble = print_table(slashed_workers)
     report += tble+'\n'
 
   print('# Rewards')
