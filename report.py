@@ -508,13 +508,13 @@ if __name__ == '__main__':
   print('## Objects Size Distribution Per Bag')
   report += '## Objects Size Distribution Per Bag \n'
   tble = print_table(bags_stats, sort_key = 'total_size bytes')
-  report += tble+'\n'
+  report += tble+'\n\n\n'
 
   image1_file = 'objects_size_{}'.format(end_date)
   image2_file = 'objects_number_{}'.format(end_date)
   get_draw_objects(image1_file,image2_file)
-  report += '![objects sizes](./{}) \n'.format(image1_file)
-  report += '![objects number](./{})  \n'.format(image1_file)
+  report += '![objects sizes](./{}.png) \n'.format(image1_file)
+  report += '![objects number](./{}.png)  \n'.format(image1_file)
 
   print('# Lost Objects - Server compare')
   report += '# Lost Objects - Server compare \n'
