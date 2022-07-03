@@ -4,6 +4,8 @@ import json
 from tabulate import tabulate
 from itertools import groupby
 from operator import itemgetter
+import numpy as np
+import matplotlib.pyplot as plt
 
 url = 'https://query.joystream.org/graphql'
 file_name = "{}-12:00-objects.txt"
@@ -254,7 +256,7 @@ def get_grouped_obj_dates(data, action):
     result[key] = { 'size': size, 'num_objects': num_objects} 
   return result
 
-def get_draw_objects():
+def get_draw_objects(filename):
   data = get_objects()
   created_objects = []
   deleted_objects = []
@@ -274,17 +276,33 @@ def get_draw_objects():
       created_objects[key]['size'] -= value['size']
       created_objects[key]['num_objects'] -= value['num_objects']
   dates = list(created_objects.keys())
-  sizes = [k['size'] for k in created_objects.values()]
+  sizes = [int(k['size'])/1048576 for k in created_objects.values()]
+  for index, size in enumerate(sizes):
+    if index == 0:
+      continue
+    sizes[index] += sizes[index-1]
   num_objects = [k['num_objects'] for k in created_objects.values()]
+  for index, num_object in enumerate(num_objects):
+    if index == 0:
+      continue
+    num_objects[index] += num_objects[index-1]  
   print('------------------------------------------------')
+  print(created_objects)
   print(dates)
   print(sizes)
   print(num_objects)
   print('------------------------------------------------')
-  print(len(dates))
-  print(len(sizes))
-  print(len(num_objects))
-  #return dates, sizes, num_objects
+  plt.xlabel('Dates')
+  plt.ylabel('Size')
+  plt.title('Size (Sum, GB)')
+  fig,ax = plt.subplots()
+  plt.plot(dates, sizes)
+  ax.set_xticks(np.arange(0, len(dates)+1, 10))
+  ax.set_yticks(np.arange(0, max(sizes), 25))
+  plt.xticks(rotation=45)
+  plt.savefig(filename)
+  plt.close()
+  return dates, sizes, num_objects
 
 def sort_bags(data):
   bags = {}
