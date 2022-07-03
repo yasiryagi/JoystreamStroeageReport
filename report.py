@@ -293,7 +293,7 @@ def get_draw_objects(file1name, file2name):
   fig, ax = plt.subplots()
   plt.plot(dates, sizes)
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
-  ax.set_yticks(np.arange(0, max(sizes), 10000))
+  ax.set_yticks(np.arange(0, len(sizes), 10000))
   plt.xticks(rotation=45)
   plt.yticks(rotation=45)
 
