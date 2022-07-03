@@ -276,7 +276,7 @@ def get_draw_objects(file1name, file2name):
       created_objects[key]['size'] -= value['size']
       created_objects[key]['num_objects'] -= value['num_objects']
   dates = list(created_objects.keys())
-  sizes = [round(int(k['size'])/1048576, 2) for k in created_objects.values()]
+  sizes = [round(int(k['size'])/1074790400, 2) for k in created_objects.values()]
   for index, size in enumerate(sizes):
     if index == 0:
       continue
@@ -293,7 +293,7 @@ def get_draw_objects(file1name, file2name):
   fig, ax = plt.subplots()
   plt.plot(dates, sizes)
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
-  ax.set_yticks(np.arange(0, len(sizes), 100))
+  ax.set_yticks(np.arange(0, max(sizes), 100))
   plt.xticks(rotation=45)
   plt.yticks(rotation=45)
 
