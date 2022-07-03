@@ -256,7 +256,7 @@ def get_grouped_obj_dates(data, action):
     result[key] = { 'size': size, 'num_objects': num_objects} 
   return result
 
-def get_draw_objects(file1name, file2name):
+def get_draw_objects(filename):
   data = get_objects()
   created_objects = []
   deleted_objects = []
@@ -294,8 +294,7 @@ def get_draw_objects(file1name, file2name):
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
   ax.set_yticks(np.arange(0, max(sizes), 100))
   plt.xticks(rotation=45)
-  plt.savefig(file1name)
-  plt.close()
+  
   plt.xlabel('Dates')
   plt.ylabel('#')
   plt.title('Number of Objects')
@@ -304,7 +303,9 @@ def get_draw_objects(file1name, file2name):
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
   ax.set_yticks(np.arange(0, max(num_objects), 100))
   plt.xticks(rotation=45)
-  plt.savefig(file2name)
+  plt.yticks(rotation=45)
+  
+  plt.savefig(filename)
   plt.close()
 
 def sort_bags(data):
@@ -511,10 +512,10 @@ if __name__ == '__main__':
   report += tble+'\n\n\n'
 
   image1_file = 'objects_size_{}'.format(end_date)
-  image2_file = 'objects_number_{}'.format(end_date)
-  get_draw_objects(image1_file,image2_file)
+  #image2_file = 'objects_number_{}'.format(end_date)
+  get_draw_objects(image1_file)
   report += '![objects sizes](./{}.png) \n'.format(image1_file)
-  report += '![objects number](./{}.png)  \n'.format(image1_file)
+  #report += '![objects number](./{}.png)  \n'.format(image1_file)
 
   print('# Lost Objects - Server compare')
   report += '# Lost Objects - Server compare \n'
