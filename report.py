@@ -122,9 +122,9 @@ def get_bags(start_time, end_time):
   
 def get_objects(start_time='',end_time=''):
   if start_time and end_time :
-    query_created = {"query":'query MyQuery {{ storageDataObjects(limit: 33000, offset: 0,where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{ size id storageBagId }} }}'.format(start_time, end_time) }
+    query_created = {"query":'query MyQuery {{ storageDataObjects(limit: 33000, offset: 0,where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }} }}'.format(start_time, end_time) }
   else :
-    query_created = {"query":'query MyQuery { storageDataObjects(limit: 33000, offset: 0) { size id storageBagId } }' }
+    query_created = {"query":'query MyQuery { storageDataObjects(limit: 33000, offset: 0) { createdAt deletedAt size id storageBagId } }' }
   objects_created  = queryGrapql(query_created)['storageDataObjects']
   for obj in objects_created: 
     obj['storageBagId'] = obj['storageBagId'].split(":")[2]
@@ -242,6 +242,49 @@ def get_0bjects_ranges(data_created,total_size,sizes,sizes_range):
       sizes_range['100000-10000000 MB'] += 1
   return  total_size, sizes, sizes_range
 
+def get_grouped_obj_dates(data, action):
+  result = {}
+  created_objects =  sorted(data, key = itemgetter(action))
+  for key, records in groupby(data, key = itemgetter(action)):
+    records = list(records)
+    size = 0
+    num_objects = len(records)
+    for record in records:
+      size += int(record['size'])
+    result[key] = { 'size': size, 'num_objects': num_objects} 
+  return result
+
+def get_draw_objects():
+  data = get_objects()
+  created_objects = []
+  deleted_objects = []
+  for record in data:
+    record['createdAt'] =  record['createdAt'].split('T')[0]
+    created_objects.append({'createdAt': record['createdAt'], 'size': record['size']})
+    if record['deletedAt']:
+      record['deletedAt'] =  record['deletedAt'].split('T')[0]
+      deleted_objects.append({'deletedAt': record['deletedAt'], 'size': record['size']})
+  num_created_objects = len(created_objects)
+  num_deleted_objects = len(deleted_objects)
+  if num_created_objects > 0:
+    created_objects = get_grouped_obj_dates(created_objects, 'createdAt')
+  if num_deleted_objects > 0:
+    deleted_objects = get_grouped_obj_dates(deleted_objects, 'deletedAt')
+    for key, value in deleted_objects.items:
+      created_objects[key]['size'] -= value['size']
+      created_objects[key]['num_objects'] -= value['num_objects']
+  dates = list(created_objects.keys())
+  sizes = [k['size'] for k in created_objects.values()]
+  num_objects = [k['num_objects'] for k in created_objects.values()]
+  print('------------------------------------------------')
+  print(dates)
+  print(sizes)
+  print(num_objects)
+  print('------------------------------------------------')
+  print(len(dates))
+  print(len(sizes))
+  print(len(num_objects))
+  #return dates, sizes, num_objects
 
 def sort_bags(data):
   bags = {}
