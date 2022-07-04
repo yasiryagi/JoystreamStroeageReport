@@ -289,15 +289,15 @@ def get_draw_objects(file1name, file2name):
     num_objects[index] += num_objects[index-1]  
   
 
-  plot(dates[1:], sizes[1:], 'Size (Sum, GB)', 'Dates', 'Size', 10, 100,file1name)
-  plot(dates[1:], num_objects[1:], 'Number of Objects', 'Dates', 'Number of Objects', 10, 1500,file2name)
+  plot(dates[1:], sizes[1:], 'Size (Sum, GB)', 'Dates', 'Size', 0, 700 , 10, 100,file1name)
+  plot(dates[1:], num_objects[1:], 'Number of Objects', 'Dates', 'Number of Objects', 0, 1200, 10, 1500,file2name)
 
-def plot(x, y, title, x_label, y_label, x_spacing, y_spacing,filename):
+def plot(x, y, title, x_label, y_label, x_start, y_start, x_spacing, y_spacing,filename):
   fig, ax = plt.subplots()
   fig.set_size_inches(15, 10)
   plt.plot(x, y)
-  ax.set_xticks(np.arange(0, len(x)+1, x_spacing))
-  ax.set_yticks(np.arange(0, max(y), y_spacing))
+  ax.set_xticks(np.arange(x_start, len(x)+1, x_spacing))
+  ax.set_yticks(np.arange(y_start, max(y), y_spacing))
   ax.set_title(title)
   ax.set(xlabel=x_label, ylabel=y_label)
   plt.xticks(rotation=45)
