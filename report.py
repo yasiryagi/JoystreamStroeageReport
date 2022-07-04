@@ -113,7 +113,7 @@ def get_termination(start_time, end_time):
      record["worker"] = record["worker"]["membershipId"]
   return length,data
 
-def get_bags(start_time, end_time):
+def get_bags_nums(start_time, end_time):
   query_created = {"query": 'query MyQuery {{ storageBags( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
   query_deleted = {"query": 'query MyQuery {{ storageBags( where: {{deletedAt_gt: "{}" , deletedAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
   data_created  = queryGrapql(query_created)['storageBags']
@@ -121,7 +121,15 @@ def get_bags(start_time, end_time):
   num_bags_created = len(data_created)
   num_bags_deleted = len(data_deleted)
   return {"bag created": num_bags_created, "bags deleted": num_bags_deleted}
-  
+ 
+def get_bags(start_time='', end_time=''):
+  if start_time and end_time :
+    query = {"query": 'query MyQuery {{ storageBags( limit: 33000, offset: 0, where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id createdAt deletedAt }} }}'.format(start_time, end_time) }
+  else:
+    query = {"query": 'query MyQuery { storageBags( limit: 33000, offset: 0) {  id createdAt deletedAt }} ' }
+    data = queryGrapql(query)['storageBags']
+    return len(data), data
+
 def get_objects(start_time='',end_time=''):
   if start_time and end_time :
     query_created = {"query":'query MyQuery {{ storageDataObjects(limit: 33000, offset: 0,where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }} }}'.format(start_time, end_time) }
@@ -307,16 +315,45 @@ def plot(x, y, title, x_label, y_label, x_start, y_start, x_spacing, y_spacing,f
   plt.close()
   
 
-def sort_bags(data):
+def get_draw_bags(filename):
+  num, data = get_bags()
+  created_bags = []
+  deleted_bags = []
+  for record in data:
+    record['createdAt'] =  record['createdAt'].split('T')[0]
+    created_bags.append({'createdAt': record['createdAt'], 'id': record['id']})
+    if record['deletedAt']:
+      record['deletedAt'] =  record['deletedAt'].split('T')[0]
+      deleted_bags.append({'deletedAt': record['deletedAt'], 'id': record['id']})
+  num_created_bags = len(created_bags)
+  num_deleted_bags = len(deleted_bags)
   bags = {}
-  sorted_data = sorted(data, key = itemgetter('storageBagId'))
-  for key, value in groupby(sorted_data, key = itemgetter('storageBagId')):
+  if num_created_bags > 0:
+    created_bags = sort_bags(created_bags, 'createdAt')
+    for key, record in created_bags.items():
+        bags[key] = len(record)
+  if num_deleted_bags > 0:
+    deleted_bags = sort_bags(deleted_bags, 'deletedAt')
+    for key, record in deleted_objects.items():
+      bags[key] -= len(record)
+  dates = list(bags.keys())
+  num_bags = [k for k in bags.values()]
+  for index, num_bag in enumerate(num_bags):
+    if index == 0:
+      continue
+    num_bags[index] += num_bags[index-1]
+  plot(dates[1:], num_bags[1:], 'Number of Bags', 'Dates', 'Number of Bags', 0, 250 , 10, 10,filename)
+
+def sort_bags(data, key):
+  bags = {}
+  sorted_data = sorted(data, key = itemgetter(key))
+  for key, value in groupby(sorted_data, key = itemgetter(key)):
     #key = key.split(":")[2]
     bags[key]= list(value)
   return(bags)
  
 def bag_stats(data_created): 
-  bags = sort_bags(data_created)
+  bags = sort_bags(data_created, 'storageBagId')
   #print(bags)
   result= []
   for key, value in bags.items():
@@ -461,7 +498,7 @@ if __name__ == '__main__':
 
   print('## Bags')
   report += '## Bags\n'
-  bags = get_bags(start_time, end_time)
+  bags = get_bags_nums(start_time, end_time)
   print('Bags Created: {} \n'.format(bags['bag created']))
   print('Bags Deleted: {} \n'.format(bags['bags deleted']))
   report += 'Bags Created: {} \n\n'.format(bags['bag created'])
@@ -515,6 +552,10 @@ if __name__ == '__main__':
   get_draw_objects(image1_file, image2_file)
   report += '![objects sizes](./{}.png) \n'.format(image1_file)
   report += '![objects number](./{}.png)  \n'.format(image2_file)
+  
+  image3_file = 'bags_number_{}'.format(end_date)
+  get_draw_bags(image3_file)
+  report += '![objects sizes](./{}.png) \n'.format(image3_file)
 
   #print('# Lost Objects - Server compare')
   #report += '# Lost Objects - Server compare \n'
