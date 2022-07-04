@@ -297,8 +297,8 @@ def get_draw_objects(file1name, file2name):
     num_objects[index] += num_objects[index-1]  
   
 
-  plot(dates[1:], sizes[1:], 'Size (Sum, GB)', 'Dates', 'Size', 0, 750 , 10, 100,file1name)
-  plot(dates[1:], num_objects[1:], 'Number of Objects', 'Dates', 'Number of Objects', 0, 12000, 10, 1500,file2name)
+  plot(dates[1:], sizes[1:], 'Size (Sum, GB)', 'Dates', 'Size', 0, 750 , 10, 25,file1name)
+  plot(dates[1:], num_objects[1:], 'Number of Objects', 'Dates', 'Number of Objects', 0, 12000, 10, 500,file2name)
 
 def plot(x, y, title, x_label, y_label, x_start, y_start, x_spacing, y_spacing,filename):
   fig, ax = plt.subplots()
@@ -342,7 +342,7 @@ def get_draw_bags(filename):
     if index == 0:
       continue
     num_bags[index] += num_bags[index-1]
-  plot(dates[1:], num_bags[1:], 'Number of Bags', 'Dates', 'Number of Bags', 0, 250 , 10, 10,filename)
+  plot(dates[1:], num_bags[1:], 'Number of Bags', 'Dates', 'Number of Bags', 0, 250 , 10, 50,filename)
 
 def sort_bags(data, key):
   bags = {}
