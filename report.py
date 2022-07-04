@@ -287,8 +287,6 @@ def get_draw_objects(file1name, file2name):
     if index == 0:
       continue
     num_objects[index] += num_objects[index-1]  
-  print(sizes)
-  print(num_objects)
   plt.xlabel('Dates')
   plt.ylabel('Size')
   plt.title('Size (Sum, GB)')
@@ -309,7 +307,7 @@ def get_draw_objects(file1name, file2name):
   fig, ax = plt.subplots()
   plt.plot(dates, num_objects)
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
-  ax.set_yticks(np.arange(0, max(num_objects), 1000))
+  ax.set_yticks(np.arange(0, max(num_objects), 1500))
   plt.xticks(rotation=45)
   plt.yticks(rotation=45)
   
