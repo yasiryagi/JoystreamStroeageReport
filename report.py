@@ -294,6 +294,7 @@ def get_draw_objects(file1name, file2name):
 
 def plot(x, y, title, x_label, y_label, x_spacing, y_spacing,filename):
   fig, ax = plt.subplots()
+  plt.rcParams["figure.figsize"] = (10,8)
   plt.plot(x, y)
   ax.set_xticks(np.arange(0, len(x)+1, x_spacing))
   ax.set_yticks(np.arange(0, max(y), y_spacing))
