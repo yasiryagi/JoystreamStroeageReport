@@ -534,7 +534,7 @@ if __name__ == '__main__':
   #report += 'Total Objects: {} \n\n'.format(total_objects)
   #report += 'Total Lost Objects: {} \n\n'.format(lost_object)
   #report += 'Percentage Lost Objects: %{} \n\n'.format(100*lost_object/total_objects)
-  report += tble+' \n'
+  # report += tble+' \n'
   print('# Lost Objects - GraphQl')
   report += '# Lost Objects - GraphQl \n'
   number_lost, lost = get_lost(start_time,end_time)
