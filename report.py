@@ -246,14 +246,14 @@ def get_0bjects_ranges(data_created,total_size,sizes,sizes_range):
 
 def get_grouped_obj_dates(data, action):
   result = {}
-  created_objects =  sorted(data, key = itemgetter(action))
+  data =  sorted(data, key = itemgetter(action))
   for key, records in groupby(data, key = itemgetter(action)):
     records = list(records)
     size = 0
     num_objects = len(records)
     for record in records:
       size += int(record['size'])
-    result[key] = { 'size': size, 'num_objects': num_objects} 
+    result[key] = { 'size': size, 'num_objects': num_objects}
   return result
 
 def get_draw_objects(file1name, file2name):
@@ -268,6 +268,7 @@ def get_draw_objects(file1name, file2name):
       deleted_objects.append({'deletedAt': record['deletedAt'], 'size': record['size']})
   num_created_objects = len(created_objects)
   num_deleted_objects = len(deleted_objects)
+
   if num_created_objects > 0:
     created_objects = get_grouped_obj_dates(created_objects, 'createdAt')
   if num_deleted_objects > 0:
@@ -286,7 +287,8 @@ def get_draw_objects(file1name, file2name):
     if index == 0:
       continue
     num_objects[index] += num_objects[index-1]  
-
+  print(sizes)
+  print(num_objects)
   plt.xlabel('Dates')
   plt.ylabel('Size')
   plt.title('Size (Sum, GB)')
