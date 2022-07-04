@@ -287,36 +287,24 @@ def get_draw_objects(file1name, file2name):
     if index == 0:
       continue
     num_objects[index] += num_objects[index-1]  
-  plt.xlabel('Dates')
-  plt.ylabel('Size')
-  plt.title('Size (Sum, GB)')
+  
+
+  plot(dates, sizes, 'Size (Sum, GB)', 'Dates', 'Size', 10, 100,file1name)
+  plot(dates, num_objects, 'Number of Objects', 'Dates', 'Number of Objects', 10, 1500,file2name)
+
+def plot(x, y, title, x_label, y_label, x_spacing, y_spacing,filename):
   fig, ax = plt.subplots()
-  plt.plot(dates, sizes)
-  ax.set_xticks(np.arange(0, len(dates)+1, 10))
-  ax.set_yticks(np.arange(0, max(sizes), 100))
-  ax.set_title('Size (Sum, GB)')
-  ax.set(xlabel='Dates', ylabel='Size')
+  plt.plot(x, y)
+  ax.set_xticks(np.arange(0, len(x)+1, x_spacing))
+  ax.set_yticks(np.arange(0, max(y), y_spacing))
+  ax.set_title(title)
+  ax.set(xlabel=x_label, ylabel=y_label)
   plt.xticks(rotation=45)
   plt.yticks(rotation=45)
 
-  plt.savefig(file1name)
+  plt.savefig(filename)
   plt.close()
-
   
-  plt.xlabel('Dates')
-  plt.ylabel('#')
-  plt.title('Number of Objects')
-  fig, ax = plt.subplots()
-  plt.plot(dates, num_objects)
-  ax.set_xticks(np.arange(0, len(dates)+1, 10))
-  ax.set_yticks(np.arange(0, max(num_objects), 1500))
-  ax.set_title('Number of Objects')
-  ax.set(xlabel='Dates', ylabel='#')
-  plt.xticks(rotation=45)
-  plt.yticks(rotation=45)
-  
-  plt.savefig(file2name)
-  plt.close()
 
 def sort_bags(data):
   bags = {}
@@ -527,25 +515,25 @@ if __name__ == '__main__':
   report += '![objects sizes](./{}.png) \n'.format(image1_file)
   report += '![objects number](./{}.png)  \n'.format(image2_file)
 
-  print('# Lost Objects - Server compare')
-  report += '# Lost Objects - Server compare \n'
+  #print('# Lost Objects - Server compare')
+  #report += '# Lost Objects - Server compare \n'
   master_objects = get_objects(start_time,end_time)
-  data = get_objects_files(file_server, operators, end_date, credential)
-  operators = load_objects_from_server(data)
-  operators_objects = []
-  for operator in operators:
-    operators_objects = operators_objects + operator['objects']
-  lost = compare_objects(operators_objects, master_objects)
+  #data = get_objects_files(file_server, operators, end_date, credential)
+  #operators = load_objects_from_server(data)
+  #operators_objects = []
+  #for operator in operators:
+  #  operators_objects = operators_objects + operator['objects']
+  #lost = compare_objects(operators_objects, master_objects)
   total_objects = len(master_objects)
-  lost_object = len(lost)
-  print('Total Objects: {}\n'.format(total_objects))
-  print('Total Lost Objects: {}\n'.format(lost_object))
-  print('Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects))
-  if lost_object > 0:
-    tble = print_table(lost, master_key = 'id')
-  report += 'Total Objects: {} \n\n'.format(total_objects)
-  report += 'Total Lost Objects: {} \n\n'.format(lost_object)
-  report += 'Percentage Lost Objects: %{} \n\n'.format(100*lost_object/total_objects)
+  #lost_object = len(lost)
+  #print('Total Objects: {}\n'.format(total_objects))
+  #print('Total Lost Objects: {}\n'.format(lost_object))
+  #print('Percentage Lost Objects: %{}\n'.format(100*lost_object/total_objects))
+  #if lost_object > 0:
+  #  tble = print_table(lost, master_key = 'id')
+  #report += 'Total Objects: {} \n\n'.format(total_objects)
+  #report += 'Total Lost Objects: {} \n\n'.format(lost_object)
+  #report += 'Percentage Lost Objects: %{} \n\n'.format(100*lost_object/total_objects)
   report += tble+' \n'
   print('# Lost Objects - GraphQl')
   report += '# Lost Objects - GraphQl \n'
