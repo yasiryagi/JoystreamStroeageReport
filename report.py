@@ -294,6 +294,8 @@ def get_draw_objects(file1name, file2name):
   plt.plot(dates, sizes)
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
   ax.set_yticks(np.arange(0, max(sizes), 100))
+  ax.set_title('Size (Sum, GB)')
+  ax.set(xlabel='Dates', ylabel='Size')
   plt.xticks(rotation=45)
   plt.yticks(rotation=45)
 
@@ -308,6 +310,8 @@ def get_draw_objects(file1name, file2name):
   plt.plot(dates, num_objects)
   ax.set_xticks(np.arange(0, len(dates)+1, 10))
   ax.set_yticks(np.arange(0, max(num_objects), 1500))
+  ax.set_title('Number of Objects')
+  ax.set(xlabel='Dates', ylabel='#')
   plt.xticks(rotation=45)
   plt.yticks(rotation=45)
   
