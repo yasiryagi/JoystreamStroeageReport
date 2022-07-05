@@ -71,7 +71,6 @@ def get_rewards(start_time, end_time):
 def get_new_opening(start_time, end_time):
   query = '{{ openingAddedEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ opening {{ createdAt id openingcanceledeventopening {{ createdAt }} }} }} }}'.format(start_time, end_time)
   query_dict = {"query": query}
-  print(query)
   data = queryGrapql(query_dict,url)['openingAddedEvents']
   result = []
   if len(data) == 0:
@@ -115,9 +114,13 @@ def get_termination(start_time, end_time):
      record["worker"] = record["worker"]["membershipId"]
   return length,data
 
-def get_bags_nums(start_time, end_time):
-  query_created = {"query": 'query MyQuery {{ storageBags( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
-  query_deleted = {"query": 'query MyQuery {{ storageBags( where: {{deletedAt_gt: "{}" , deletedAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
+def get_bags_nums(start_time = '', end_time = ''):
+  if start_time and end_time :
+    query_created = {"query": 'query MyQuery {{ storageBags( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
+    query_deleted = {"query": 'query MyQuery {{ storageBags( where: {{deletedAt_gt: "{}" , deletedAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
+  else :
+    query_created = {"query": 'query MyQuery { storageBags(limit: 3000, offset:0) {  id } }'}
+    query_deleted = {"query": 'query MyQuery { storageBags(limit: 3000, offset:0) {  id } }'}
   data_created  = queryGrapql(query_created)['storageBags']
   data_deleted  = queryGrapql(query_deleted)['storageBags']
   num_bags_created = len(data_created)
@@ -315,10 +318,8 @@ def plot(x, y, title, x_label, y_label, x_start, y_start, x_spacing, y_spacing,f
   fig.set_dpi(100)
   fig.savefig(filename)
   plt.close()
-  
 
-def get_draw_bags(filename):
-  num, data = get_bags()
+def get_created_deleted_bags(data):
   created_bags = []
   deleted_bags = []
   for record in data:
@@ -327,6 +328,11 @@ def get_draw_bags(filename):
     if record['deletedAt']:
       record['deletedAt'] =  record['deletedAt'].split('T')[0]
       deleted_bags.append({'deletedAt': record['deletedAt'], 'id': record['id']})
+  return created_bags,deleted_bags
+
+def get_draw_bags(filename):
+  num, data = get_bags()
+  created_bags ,deleted_bags = get_created_deleted_bags(data)
   num_created_bags = len(created_bags)
   num_deleted_bags = len(deleted_bags)
   bags = {}
@@ -344,7 +350,7 @@ def get_draw_bags(filename):
     if index == 0:
       continue
     num_bags[index] += num_bags[index-1]
-  plot(dates[1:], num_bags[1:], 'Number of Bags', 'Dates', 'Number of Bags', 0, 250 , 10, 50,filename)
+  plot(dates[1:], num_bags[1:], 'Number of Bags {}'.format(num_created_bags - num_deleted_bags), 'Dates', 'Number of Bags', 0, 250 , 10, 50,filename)
 
 def sort_bags(data, key):
   bags = {}
@@ -533,10 +539,20 @@ if __name__ == '__main__':
   report += '# Total object Info \n'
   #print(get_objects(start_time,end_time))
   objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats()
-  print('Total Objects Size: {}\n'.format(objects_num))
-  report += 'Total Objects Size: {} \n\n'.format(objects_num)
+  print('Total Objects: {}\n'.format(objects_num))
+  report += 'Total Objects: {} \n\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
   report += 'Total Objects Size: {} bytes\n\n'.format(total_size)
+  total_num_bags = len(bags_stats)
+  print('Total Number of Bags in use: {}\n'.format(total_num_bags))
+  report += 'Total Number of Bags in use: {} bytes\n\n'.format(total_num_bags)
+  num, data = get_bags()
+  created_bags ,deleted_bags = get_created_deleted_bags(data)
+  num_created_bags = len(created_bags)
+  num_deleted_bags = len(deleted_bags)
+  total_num_bags = num_created_bags - num_deleted_bags
+  print('Total Number of Bags in use: {}\n'.format(total_num_bags))
+  report += 'Total Number of Bags in use: {} bytes\n\n'.format(total_num_bags)
 
   print('## Objects Size Distribution')
   report += '## Objects Size Distribution \n'
