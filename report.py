@@ -404,11 +404,13 @@ if __name__ == '__main__':
   end_date = end_time.split('T')[0]
   previous_start_time = previous_council['electedAtTime']
   previous_end_time   = previous_council['endedAtTime']
-  file_name = 'report-'+end_time  
-  print('Full report for the Term: {} \n\n'.format(period))
+  file_name = 'report-'+end_time 
+  print(start_time)
+  print(end_time)
+  print('Full report for the Term: {} \n\n'.format(period-1))
   print('Start date: {} \n'.format(start_date))
   print('End date: {} \n'.format(end_date))
-  report += 'Full report for the Term: {} \n\n'.format(period)
+  report += 'Full report for the Term: {} \n\n'.format(period-1)
   report += 'Start date: {}  \n\n'.format(start_date)
   report += 'End date: {} \n\n'.format(end_date)
   print('Start Time: {}\n'.format(start_time))
