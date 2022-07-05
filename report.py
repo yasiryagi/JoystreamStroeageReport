@@ -551,8 +551,8 @@ if __name__ == '__main__':
   num_created_bags = len(created_bags)
   num_deleted_bags = len(deleted_bags)
   total_num_bags = num_created_bags - num_deleted_bags
-  print('Total Number of Bags in use: {}\n'.format(total_num_bags))
-  report += 'Total Number of Bags in use: {} bytes\n\n'.format(total_num_bags)
+  print('Grand Total Number of Bags: {}\n'.format(total_num_bags))
+  report += 'Grand Total Number of Bags: {} bytes\n\n'.format(total_num_bags)
 
   print('## Objects Size Distribution')
   report += '## Objects Size Distribution \n'
