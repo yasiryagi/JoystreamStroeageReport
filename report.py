@@ -69,14 +69,16 @@ def get_rewards(start_time, end_time):
   return total,result
 
 def get_new_opening(start_time, end_time):
-  query = '{{ openingAddedEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ opening {{ createdAt id }} }} }}'.format(start_time, end_time)
+  query = '{{ openingAddedEvents(where: {{group: {{id_eq: "storageWorkingGroup"}}, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ opening {{ createdAt id openingcanceledeventopening {{ createdAt }} }} }} }}'.format(start_time, end_time)
   query_dict = {"query": query}
+  print(query)
   data = queryGrapql(query_dict,url)['openingAddedEvents']
   result = []
   if len(data) == 0:
     return 0,result
   for record in data:
-    result.append(record['opening'])
+    if len(record['opening']['openingcanceledeventopening']) == 0:
+      result.append({'id': record['opening']['id'], 'createdAt': record['opening']['createdAt']})
   length = len(result)
   return length,result
 
