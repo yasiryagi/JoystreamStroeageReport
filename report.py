@@ -349,6 +349,7 @@ def get_draw_bags(filename):
   for index, num_bag in enumerate(num_bags):
     if index == 0:
       continue
+    num_bags[index] += num_bags[index-1]
   plot(dates[1:], num_bags[1:], 'Number of Bags {}'.format(num_created_bags - num_deleted_bags), 'Dates', 'Number of Bags', 0, 250 , 10, 50,filename)
 
 def sort_bags(data, key):
