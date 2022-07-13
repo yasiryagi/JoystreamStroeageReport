@@ -116,8 +116,8 @@ def get_termination(start_time, end_time):
 
 def get_bags_nums(start_time = '', end_time = ''):
   if start_time and end_time :
-    query_created = {"query": 'query MyQuery {{ storageBags( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
-    query_deleted = {"query": 'query MyQuery {{ storageBags( where: {{deletedAt_gt: "{}" , deletedAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
+    query_created = {"query": 'query MyQuery {{ storageBags( limit: 33000, offset: 0, where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
+    query_deleted = {"query": 'query MyQuery {{ storageBags( limit: 33000, offset: 0, where: {{deletedAt_gt: "{}" , deletedAt_lt: "{}"}}) {{  id }} }}'.format(start_time, end_time) }
   else :
     query_created = {"query": 'query MyQuery { storageBags(limit: 3000, offset:0) {  id } }'}
     query_deleted = {"query": 'query MyQuery { storageBags(limit: 3000, offset:0) {  id } }'}
@@ -349,7 +349,6 @@ def get_draw_bags(filename):
   for index, num_bag in enumerate(num_bags):
     if index == 0:
       continue
-    num_bags[index] += num_bags[index-1]
   plot(dates[1:], num_bags[1:], 'Number of Bags {}'.format(num_created_bags - num_deleted_bags), 'Dates', 'Number of Bags', 0, 250 , 10, 50,filename)
 
 def sort_bags(data, key):
