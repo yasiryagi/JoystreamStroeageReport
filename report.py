@@ -7,7 +7,7 @@ from operator import itemgetter
 import numpy as np
 import matplotlib.pyplot as plt
 
-url = 'https://joystream2.yyagi.cloud/graphql'
+url = 'https://joystream.yyagi.cloud/graphql'
 #url = 'https://query.joystream.org/graphql'
 file_name = "{}-12:00-objects.txt"
 file_server = "http://87.236.146.74:8000/"
@@ -16,7 +16,7 @@ credential = {'username': '', 'password' :'joystream'}
 query_group = "storageWorkingGroup"
 
 #def queryGrapql(query, url= 'https://query.joystream.org/graphql' ):
-def queryGrapql(query, url= 'https://joystream2.yyagi.cloud/graphql' ):
+def queryGrapql(query, url= 'https://joystream.yyagi.cloud/graphql' ):
   headers = {'Accept-Encoding': 'gzip, deflate, br', 'Content-Type': 'application/json',
            'Accept': 'application/json',  'Connection': 'keep-alive', 'DNT': '1', 
 		   'Origin': 'https://query.joystream.org' }
@@ -128,7 +128,15 @@ def get_bags_nums(start_time = '', end_time = ''):
   num_bags_created = len(data_created)
   num_bags_deleted = len(data_deleted)
   return {"bag created": num_bags_created, "bags deleted": num_bags_deleted}
- 
+
+def get_bags_count(start_time='', end_time=''):
+  if start_time and end_time :
+    query = {"query": 'query MyQuery {{ storageBagsConnection ( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  totalCount  }} }}'.format(start_time, end_time) }
+  else:
+    query = {"query": 'query MyQuery { storageBagsConnection {  totalCount }} ' }
+    data = queryGrapql(query)['storageDataObjectsConnection']["totalCount"]
+    return data
+
 def get_bags(start_time='', end_time=''):
   if start_time and end_time :
     query = {"query": 'query MyQuery {{ storageBags( limit: 33000, offset: 0, where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  id createdAt deletedAt }} }}'.format(start_time, end_time) }
@@ -137,15 +145,28 @@ def get_bags(start_time='', end_time=''):
     data = queryGrapql(query)['storageBags']
     return len(data), data
 
-def get_objects(start_time='',end_time=''):
+def get_objects_count(start_time='', end_time=''):
   if start_time and end_time :
-    query_created = {"query":'query MyQuery {{ storageDataObjects(limit: 33000, offset: 0,where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }} }}'.format(start_time, end_time) }
-  else :
-    query_created = {"query":'query MyQuery { storageDataObjects(limit: 33000, offset: 0) { createdAt deletedAt size id storageBagId } }' }
-  objects_created  = queryGrapql(query_created)['storageDataObjects']
-  for obj in objects_created: 
-    obj['storageBagId'] = obj['storageBagId'].split(":")[2]
-  return objects_created
+    query = {"query": 'query MyQuery {{ storageDataObjectsConnection ( where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{  totalCount  }} }}'.format(start_time, end_time) }
+  else:
+    query = {"query": 'query MyQuery { storageDataObjectsConnection {  totalCount }} ' }
+  data = queryGrapql(query)['storageDataObjectsConnection']["totalCount"]
+  return data
+
+def get_objects(start_time='',end_time='',obj_count=33000, limit=33000):
+  import math
+  loop= math.ceil(obj_count/limit)
+  offset=0
+  obj_data=[] 
+  for i in range(loop):
+    if start_time and end_time :
+      query_created = {"query":'query MyQuery {{ storageDataObjects(limit: {}, offset: {} orderBy: createdAt_ASC,where: {{createdAt_gt: "{}" , createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }} }}'.format(limit, offset, start_time, end_time) }
+    else :
+      query_created = {"query":'query MyQuery {{ storageDataObjects(limit: {}, offset: {} orderBy: createdAt_ASC) {{ createdAt deletedAt size id storageBagId }} }}'.format(limit, offset) }
+    objects_created  = queryGrapql(query_created)['storageDataObjects']
+    obj_data += objects_created
+    offset += limit
+  return obj_data
   
 def get_objects_files(file_server, operators, end_date, credential):
   result= []
@@ -198,12 +219,15 @@ def get_lost(start_time, end_time):
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['storageDataObjects']
   for obj in data:
-    obj['storageBagId'] = obj['storageBagId'].split(":")[2]
+    try:
+      obj['storageBagId'] = obj['storageBagId'].split(":")[2]
+    except IndexError as e:
+      print(f"{e}")
   length = len(data)
   return length,data
 
-def objects_stats(start_time='',end_time=''):
-  data_created = get_objects(start_time,end_time)
+def objects_stats(data_created):
+  #data_created = get_objects(start_time,end_time)
   num_objects_created = len(data_created)
   total_size = 0
   sizes = {'<10 MB': 0,'<100 MB': 0,'<1000 MB': 0,'<10000 MB': 0,'<100000 MB': 0,'<1000000 MB': 0}
@@ -519,8 +543,10 @@ if __name__ == '__main__':
   print('# Objects Info during this Council Period')
   report += '# Objects Info during this Council Period \n'
   #print(get_objects(start_time,end_time))
-  objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats(start_time,end_time)
-  print('Total Objects Size: {}\n'.format(objects_num))
+  objects_num_qn = get_objects_count(start_time,end_time)
+  obj_data=get_objects(start_time,end_time,objects_num_qn)
+  objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats(obj_data)
+  print('Total Objects Size: {}\n'.format(objects_num_qn))
   report += 'Total Objects Size: {} \n\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
   report += 'Total Objects Size: {} bytes \n\n'.format(total_size)
@@ -532,16 +558,18 @@ if __name__ == '__main__':
   tble = print_table([sizes_range])
   report += tble+'\n'
 
-  print('## Objects Size Distribution Per Bag')
-  tble = print_table(bags_stats)
+  #print('## Objects Size Distribution Per Bag')
+  #tble = print_table(bags_stats)
   report += '## Objects Size Distribution Per Bag \n'
   report += tble+'\n'
 
   print('# Total object Info')
   report += '# Total object Info \n'
   #print(get_objects(start_time,end_time))
-  objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats()
-  print('Total Objects: {}\n'.format(objects_num))
+  objects_num_qn_ = get_objects_count()
+  obj_data_=get_objects('','',objects_num_qn_)
+  objects_num, total_size,sizes,sizes_range,bags_stats = objects_stats(obj_data_)
+  print('Total Objects: {}\n'.format(objects_num_qn_))
   report += 'Total Objects: {} \n\n'.format(objects_num)
   print('Total Objects Size: {}\n'.format(total_size))
   report += 'Total Objects Size: {} bytes\n\n'.format(total_size)
@@ -564,9 +592,9 @@ if __name__ == '__main__':
 
   tble = print_table([sizes_range])
   report += tble+'\n'
-  print('## Objects Size Distribution Per Bag')
+  #print('## Objects Size Distribution Per Bag')
   report += '## Objects Size Distribution Per Bag \n'
-  tble = print_table(bags_stats, sort_key = 'total_size bytes')
+  #tble = print_table(bags_stats, sort_key = 'total_size bytes')
   report += tble+'\n\n\n'
 
   image1_file = 'objects_size_{}'.format(end_date)
@@ -575,20 +603,20 @@ if __name__ == '__main__':
   report += '![objects sizes](./{}.png) \n'.format(image1_file)
   report += '![objects number](./{}.png)  \n'.format(image2_file)
   
-  image3_file = 'bags_number_{}'.format(end_date)
-  get_draw_bags(image3_file)
-  report += '![objects sizes](./{}.png) \n'.format(image3_file)
+  #image3_file = 'bags_number_{}'.format(end_date)
+  #get_draw_bags(image3_file)
+  #report += '![objects sizes](./{}.png) \n'.format(image3_file)
 
   #print('# Lost Objects - Server compare')
   #report += '# Lost Objects - Server compare \n'
-  master_objects = get_objects(start_time,end_time)
+  #master_objects = get_objects(start_time,end_time)
   #data = get_objects_files(file_server, operators, end_date, credential)
   #operators = load_objects_from_server(data)
   #operators_objects = []
   #for operator in operators:
   #  operators_objects = operators_objects + operator['objects']
   #lost = compare_objects(operators_objects, master_objects)
-  total_objects = len(master_objects)
+  #total_objects = len(master_objects)
   #lost_object = len(lost)
   #print('Total Objects: {}\n'.format(total_objects))
   #print('Total Lost Objects: {}\n'.format(lost_object))
@@ -602,14 +630,14 @@ if __name__ == '__main__':
   print('# Lost Objects - GraphQl')
   report += '# Lost Objects - GraphQl \n'
   number_lost, lost = get_lost(start_time,end_time)
-  print('Total Objects: {}\n'.format(total_objects))
+  print('Total Objects: {}\n'.format(objects_num_qn))
   print('Total Lost Objects: {}\n'.format(number_lost))
-  print('Percentage Lost Objects: %{}\n'.format(100*number_lost/total_objects))
+  print('Percentage Lost Objects: %{}\n'.format(100*number_lost/objects_num_qn))
   if number_lost > 0:
     tble = print_table(lost, master_key = 'id')
-  report += 'Total Objects: {} \n\n'.format(total_objects)
+  report += 'Total Objects: {} \n\n'.format(objects_num_qn)
   report += 'Total Lost Objects: {} \n\n'.format(number_lost)
-  report += 'Percentage Lost Objects: %{} \n\n'.format(100*number_lost/total_objects)
+  report += 'Percentage Lost Objects: %{} \n\n'.format(100*number_lost/objects_num_qn)
   report += tble+' \n'
   file_name = 'report_'+end_time+'.md'
   with open(file_name, 'w') as file:
