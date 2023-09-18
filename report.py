@@ -295,8 +295,8 @@ def get_grouped_obj_dates(data, action):
     result[key] = { 'size': size, 'num_objects': num_objects}
   return result
 
-def get_draw_objects(file1name, file2name):
-  data = get_objects()
+def get_draw_objects(data,file1name, file2name):
+  #data = get_objects()
   created_objects = []
   deleted_objects = []
   for record in data:
@@ -327,7 +327,6 @@ def get_draw_objects(file1name, file2name):
       continue
     num_objects[index] += num_objects[index-1]  
   
-
   plot(dates[1:], sizes[1:], 'Size (Sum, GB)', 'Dates', 'Size', 0, 1000 , 30, 1000,file1name)
   plot(dates[1:], num_objects[1:], 'Number of Objects', 'Dates', 'Number of Objects', 0, 12000, 10, 500,file2name)
 
@@ -599,7 +598,7 @@ if __name__ == '__main__':
 
   image1_file = 'objects_size_{}'.format(end_date)
   image2_file = 'objects_number_{}'.format(end_date)
-  get_draw_objects(image1_file, image2_file)
+  get_draw_objects(obj_data_,image1_file, image2_file)
   report += '![objects sizes](./{}.png) \n'.format(image1_file)
   report += '![objects number](./{}.png)  \n'.format(image2_file)
   
