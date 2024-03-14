@@ -44,7 +44,10 @@ def get_backets(url, start_time = '', end_time = '', createdat = False, deleteda
   data  = queryGrapql(query, url)['storageBuckets']
   for record in data:
     record['bags'] = len(record['bags'])
-    record['Utilization'] = int(record['dataObjectsSize'])/int(record['dataObjectsSizeLimit'])
+    if int(record['dataObjectsSizeLimit']) == 0 :
+      record['Utilization'] = 0
+    else:
+      record['Utilization'] = int(record['dataObjectsSize'])/int(record['dataObjectsSizeLimit'])
     record['dataObjectsSize, GB'] = int(record['dataObjectsSize']) / 1074790400
   #keys = list(data[0].keys())
   #file_name= 'backets_info_'+ time.strftime("%Y%m%d%H%M%S")+'.csv'
@@ -215,7 +218,7 @@ def compare_objects(file_objects, objects):
     return lost
 
 def get_lost(start_time, end_time):
-  query = '{{ storageDataObjects(limit: 3000, offset: 0, where: {{isAccepted_eq: false, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }}}}'.format(start_time, end_time)
+  query = '{{ storageDataObjects(limit: 33000, offset: 0, where: {{isAccepted_eq: false, createdAt_gt: "{}", createdAt_lt: "{}"}}) {{ createdAt size id storageBagId }}}}'.format(start_time, end_time)
   query_dict = {"query": query}
   data = queryGrapql(query_dict,url)['storageDataObjects']
   for obj in data:
