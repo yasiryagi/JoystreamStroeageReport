@@ -7,7 +7,7 @@ from operator import itemgetter
 import numpy as np
 import matplotlib.pyplot as plt
 
-url = 'https://joystream.yyagi.cloud/graphql'
+url = 'https://query.joystream.org/graphql'
 #url = 'https://query.joystream.org/graphql'
 file_name = "{}-12:00-objects.txt"
 file_server = "http://87.236.146.74:8000/"
@@ -16,7 +16,7 @@ credential = {'username': '', 'password' :'joystream'}
 query_group = "storageWorkingGroup"
 
 #def queryGrapql(query, url= 'https://query.joystream.org/graphql' ):
-def queryGrapql(query, url= 'https://joystream.yyagi.cloud/graphql' ):
+def queryGrapql(query, url= 'https://query.joystream.org/graphql' ):
   headers = {'Accept-Encoding': 'gzip, deflate, br', 'Content-Type': 'application/json',
            'Accept': 'application/json',  'Connection': 'keep-alive', 'DNT': '1', 
 		   'Origin': 'https://query.joystream.org' }
@@ -31,6 +31,7 @@ def get_councils_period(url):
     data.pop(-1)
   data = sorted(data, key = itemgetter('endedAtBlock'))
   period = len(data)
+  print(data)
   return data[-1], data[-2], data[0], period
 
 def get_backets(url, start_time = '', end_time = '', createdat = False, deletedat = False):
